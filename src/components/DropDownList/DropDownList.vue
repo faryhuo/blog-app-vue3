@@ -1,7 +1,7 @@
 <template>
-  <div class="dropdown btn-group">
-    <li class="list-inline-item"><a href="#" class="btn btn-outline-light my-2">{{title}}</a></li>
-    <ul class="dropdown-menu">
+  <div class="dropdown">
+    <a href="#" class="btn btn-outline-light my-2 dropdown-toggle" @click.prevent="toggleOpen">{{title}}</a>
+    <ul class="dropdown-menu" style="display:block" v-if="isOpen">
         <slot/>
     </ul>
   </div>
@@ -9,7 +9,7 @@
 
 <script lang="ts">
 
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 
 export default defineComponent({
   name: 'DropDownList',
@@ -20,7 +20,13 @@ export default defineComponent({
     }
   },
   setup (props) {
+    const isOpen = ref(false)
+    const toggleOpen = () => {
+      isOpen.value = !isOpen.value
+    }
     return {
+      isOpen,
+      toggleOpen
     }
   }
 })
