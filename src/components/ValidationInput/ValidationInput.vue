@@ -1,7 +1,7 @@
 <template>
   <div class="validate-input-container pb-3">
     <input type="text" class="form-control" :class="{'is-invalid':inputRef.error}"
-     :value="inputRef.val" @blur="ValidateInput" @input="updateValue" v-bind="$attrs" >
+     :value="inputRef.val" @blur="validateInput" @input="updateValue" v-bind="$attrs" >
     <span class="invalid-feedback" v-if="inputRef.error">{{inputRef.message}}</span>
   </div>
 </template>
@@ -36,7 +36,7 @@ export default defineComponent({
       inputRef.val = targetValue
       context.emit('update:modelValue', targetValue)
     }
-    const ValidateInput = () => {
+    const validateInput = () => {
       if (props.rules) {
         const allPassed = props.rules.every(rule => {
           let passed = true
@@ -54,11 +54,14 @@ export default defineComponent({
           return passed
         })
         inputRef.error = !allPassed
+        return allPassed
+      } else {
+        return true
       }
     }
     return {
       inputRef,
-      ValidateInput,
+      validateInput,
       updateValue
     }
   }

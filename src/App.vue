@@ -2,13 +2,16 @@
   <div class="container">
     <global-header :user="user"/>
     <column-list :list="list"/>
-    <form>
+    <ValidationForm @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">Email</label>
-        <validation-input :rules="emailRules" v-model="emailValue" placeholder="fff"/>
+        <validation-input ref="inputRef" :rules="emailRules" v-model="emailValue" placeholder="fff"/>
       </div>
       <div>{{emailValue}}</div>
-    </form>
+      <!-- <template #submit>
+        <span>submit</span>
+      </template> -->
+    </ValidationForm>
   </div>
 </template>
 
@@ -19,6 +22,7 @@ import ColumnList from '@/components/ColumnList/ColumnList.vue'
 import ValidationInput, { RulesProps } from '@/components/ValidationInput/ValidationInput.vue'
 import GlobalHeader, { UserProps } from '@/components/GlobalHeader/GlobalHeader.vue'
 import testData from '@/testData/columnList'
+import ValidationForm from '@/components/ValidationForm/ValidationForm.vue'
 
 const currentUser: UserProps = {
   isLogin: true,
@@ -31,7 +35,8 @@ export default defineComponent({
   components: {
     ColumnList,
     GlobalHeader,
-    ValidationInput
+    ValidationInput,
+    ValidationForm
   },
   setup () {
     const emailRules: RulesProps = [{
@@ -47,13 +52,19 @@ export default defineComponent({
       message: ''
     })
     const emailValue = ref('')
+    const inputRef = ref<any>()
+    const onFormSubmit = (result: boolean) => {
+      console.log(inputRef.value.validateInput())
+    }
 
     return {
       list: testData,
       user: currentUser,
       emailRef,
       emailRules,
-      emailValue
+      emailValue,
+      onFormSubmit,
+      inputRef
     }
   }
 })
