@@ -8,14 +8,18 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, reactive } from 'vue'
+import { defineComponent, onMounted, PropType, reactive } from 'vue'
+import { emitter } from '../ValidationForm/ValidationForm.vue'
 
-interface RoleProps{
-    type:'required' | 'email';
-    message:string;
+type ruleType='required' | 'email' | 'custom';
+
+interface RuleProps{
+    type:ruleType;
+    message?:string;
+    customValid?: (value:any)=> boolean;
 }
 
-export type RulesProps=RoleProps[];
+export type RulesProps=RuleProps[];
 
 export default defineComponent({
   name: 'ValidationInput',
@@ -36,17 +40,35 @@ export default defineComponent({
       inputRef.val = targetValue
       context.emit('update:modelValue', targetValue)
     }
+    const getDefaultErroeMessage = (type:ruleType) => {
+      switch (type) {
+        case 'required':
+          return 'cannot be empty'
+        case 'email':
+          return 'email format is incorrect'
+        default:
+          return ''
+      }
+    }
+
     const validateInput = () => {
       if (props.rules) {
         const allPassed = props.rules.every(rule => {
           let passed = true
-          inputRef.message = rule.message
+          if (rule.message) {
+            inputRef.message = rule.message
+          } else {
+            inputRef.message = getDefaultErroeMessage(rule.type)
+          }
           switch (rule.type) {
             case 'required':
               passed = (inputRef.val.trim() !== '')
               break
             case 'email':
               passed = eamilReg.test(inputRef.val)
+              break
+            case 'custom':
+              passed = rule.customValid ? rule.customValid(inputRef.val) : true
               break
             default:
               break
@@ -59,6 +81,10 @@ export default defineComponent({
         return true
       }
     }
+    onMounted(() => {
+      emitter.emit('form-item-created', validateInput)
+    })
+
     return {
       inputRef,
       validateInput,

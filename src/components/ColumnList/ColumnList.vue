@@ -1,6 +1,6 @@
 <template>
   <div class="row">
-    <div class="col-4 mb-4" v-for="column in columnList.values" :key="column.id" >
+    <div class="col-4 mb-4" v-for="column in columnList" :key="column.id" >
       <div class="card h-100 shadow-sm">
         <div class="card-body text-center">
           <img :src="column.avatar" :alt="column.title" class="rounded-circle border border-light w-25 my-3"/>
@@ -32,6 +32,7 @@ export default defineComponent({
         if (!column.avatar) {
           column.avatar = require('@/assets/logo.png')
         }
+        return column
       })
     })
 

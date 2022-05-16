@@ -11,7 +11,11 @@
 
 <script lang="ts">
 
-import { defineComponent, PropType, reactive } from 'vue'
+import { defineComponent, onUnmounted, PropType, reactive } from 'vue'
+import mitt from 'mitt'
+
+export const emitter = mitt()
+type ValidateFunc = () => boolean
 
 export default defineComponent({
   name: 'ValidationForm',
@@ -20,17 +24,23 @@ export default defineComponent({
   },
   emits: ['form-submit'],
   setup (props, context) {
+    let funcArr: ValidateFunc[] = []
     const submitForm = () => {
-      context.emit('form-submit', true)
+      const result = funcArr.map(func => func()).every(result => result)
+      context.emit('form-submit', result)
     }
+    const callback = (func: any) => {
+      funcArr.push(func)
+    }
+    emitter.on('form-item-created', callback)
+    onUnmounted(() => {
+      emitter.off('form-item-created', callback)
+      funcArr = []
+    })
+
     return {
       submitForm
     }
-  },
-  mounted () {
-    this.$on('item-created', () => {
-      //
-    })
   }
 })
 
